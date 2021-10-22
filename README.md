@@ -9,5 +9,5 @@ Import/Export Google Chrome or Microsoft Edge's custom search engines and sync (
 
 ## Thanks
 
-Thanks to [ludovicchabant](https://github.com/ludovicchabant) for [ludovicchabant](https://github.com/ludovicchabant)/[Chrome-Search-Engine-Sync](https://github.com/ludovicchabant/Chrome-Search-Engine-Sync)
+Thanks to [ludovicchabant](https://github.com/ludovicchabant) for [ludovicchabant/Chrome-Search-Engine-Sync](https://github.com/ludovicchabant/Chrome-Search-Engine-Sync)
 
