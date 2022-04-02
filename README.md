@@ -1,8 +1,8 @@
-# Custom Search Engines Backup & Sync
 
+![custom-search-engines-backup](https://socialify.git.ci/erbanku/custom-search-engines-backup/image?description=1&forks=1&language=1&name=1&owner=1&pattern=Floating%20Cogs&pulls=1&stargazers=1&theme=Dark)
 ![777](https://user-images.githubusercontent.com/79493862/138395266-146e3658-3b0c-4528-b394-87a742518267.png)
 
-
+# Custom Search Engines Backup & Sync
 Import/Export Google Chrome or Microsoft Edge's custom search engines and sync (overwrite) between 2 browsers.
 
 - [Import Export Chrome Custom Search Engines](https://github.com/erbanku/custom-search-engines-backup/tree/main/Import%20Export%20Chrome%20Custom%20Search%20Engines)
