@@ -27,10 +27,21 @@ for /d %%P in ("%CHROME_PATH%\*") do (
 )
 
 :: Get user selection
+:get_selection
 set /p "selection=Enter profile numbers to import (comma-separated) or 'all' for all profiles: "
+
+:: Validate selection
+if "!selection!"=="" (
+    echo Error: No selection entered. Please try again.
+    goto get_selection
+)
+
+:: Remove spaces from selection for better parsing
+set "selection=!selection: =!"
 
 :: Process each profile
 set profile_num=0
+set processed_count=0
 for /d %%P in ("%CHROME_PATH%\*") do (
     if exist "%%P\Web Data" (
         set /a profile_num+=1
@@ -47,10 +58,19 @@ for /d %%P in ("%CHROME_PATH%\*") do (
         
         if defined import_profile (
             set "PROFILE_NAME=%%~nxP"
-            set SOURCE=%BASE_SOURCE%_!PROFILE_NAME!.sql
+            
+            :: Sanitize profile name for filename (replace problematic characters)
+            set "SAFE_PROFILE_NAME=!PROFILE_NAME: =_!"
+            set "SAFE_PROFILE_NAME=!SAFE_PROFILE_NAME:(=_!"
+            set "SAFE_PROFILE_NAME=!SAFE_PROFILE_NAME:)=_!"
+            set "SAFE_PROFILE_NAME=!SAFE_PROFILE_NAME:[=_!"
+            set "SAFE_PROFILE_NAME=!SAFE_PROFILE_NAME:]=_!"
+            
+            set SOURCE=%BASE_SOURCE%_!SAFE_PROFILE_NAME!.sql
             set SOURCE=!SOURCE:\=/!
             
             if exist "!SOURCE!" (
+                set /a processed_count+=1
                 echo Importing Chrome keywords to !PROFILE_NAME! from !SOURCE!...
                 cd /D "%%P"
                 
@@ -81,6 +101,22 @@ for /d %%P in ("%CHROME_PATH%\*") do (
     )
 )
 
+:: Validate that at least one profile was processed
+if !processed_count! equ 0 (
+    echo.
+    echo Warning: No profiles were imported. This could be because:
+    echo 1. No valid profile numbers were selected
+    echo 2. No source files were found for the selected profiles
+    if not "!selection!"=="all" (
+        echo Please ensure you entered valid profile numbers from 1 to !profile_count!.
+    )
+    echo.
+    pause
+    goto end
+)
+
 popd
-echo Import complete.
+echo.
+echo Import complete. Processed !processed_count! profile(s).
+:end
 pause
