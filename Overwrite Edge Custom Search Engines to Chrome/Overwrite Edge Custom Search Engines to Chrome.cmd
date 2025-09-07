@@ -47,13 +47,53 @@ for /d %%P in ("%CHROME_PATH%\*") do (
 :select_profiles
 set /p "edge_selection=Enter Edge profile number to export (or 'done' to finish after overwrite complete): "
 if /i "!edge_selection!"=="done" goto end
+
+:: Validate Edge selection
+if "!edge_selection!"=="" (
+    echo Error: No Edge profile selection entered. Please try again.
+    goto select_profiles
+)
+
+:: Check if Edge selection is a valid number and within range
+if !edge_selection! lss 1 (
+    echo Error: Please enter a valid Edge profile number (1 to !edge_profile_count!).
+    goto select_profiles
+)
+if !edge_selection! gtr !edge_profile_count! (
+    echo Error: Please enter a valid Edge profile number (1 to !edge_profile_count!).
+    goto select_profiles
+)
+
 set /p "chrome_selection=Enter Chrome profile number to import to: "
+
+:: Validate Chrome selection  
+if "!chrome_selection!"=="" (
+    echo Error: No Chrome profile selection entered. Please try again.
+    goto select_profiles
+)
+
+:: Check if Chrome selection is a valid number and within range
+if !chrome_selection! lss 1 (
+    echo Error: Please enter a valid Chrome profile number (1 to !chrome_profile_count!).
+    goto select_profiles
+)
+if !chrome_selection! gtr !chrome_profile_count! (
+    echo Error: Please enter a valid Chrome profile number (1 to !chrome_profile_count!).
+    goto select_profiles
+)
 
 :: Process the selected profiles
 set "edge_profile=!edge_profile_%edge_selection%!"
 set "chrome_profile=!chrome_profile_%chrome_selection%!"
 
-set DESTINATION=%BASE_DESTINATION%_!edge_profile!.sql
+:: Sanitize profile names for filename (replace problematic characters)
+set "safe_edge_profile=!edge_profile: =_!"
+set "safe_edge_profile=!safe_edge_profile:(=_!"
+set "safe_edge_profile=!safe_edge_profile:)=_!"
+set "safe_edge_profile=!safe_edge_profile:[=_!"
+set "safe_edge_profile=!safe_edge_profile:]=_!"
+
+set DESTINATION=%BASE_DESTINATION%_!safe_edge_profile!.sql
 set DESTINATION=!DESTINATION:\=/!
 
 echo Exporting Edge keywords from !edge_profile! to !DESTINATION!...
@@ -82,7 +122,7 @@ rem Clean up temp files
 del %TEMP_SQL_SCRIPT% 2>nul
 del %TEMP_DB% 2>nul
 
-set SOURCE=%BASE_DESTINATION%_!edge_profile!.sql
+set SOURCE=%BASE_DESTINATION%_!safe_edge_profile!.sql
 set SOURCE=!SOURCE:\=/!
 
 if exist "!SOURCE!" (
