@@ -26,10 +26,21 @@ for /d %%P in ("%CHROME_PATH%\*") do (
 )
 
 :: Get user selection
+:get_selection
 set /p "selection=Enter profile numbers to export (comma-separated) or 'all' for all profiles: "
+
+:: Validate selection
+if "!selection!"=="" (
+    echo Error: No selection entered. Please try again.
+    goto get_selection
+)
+
+:: Remove spaces from selection for better parsing
+set "selection=!selection: =!"
 
 :: Process each profile
 set profile_num=0
+set selected_count=0
 for /d %%P in ("%CHROME_PATH%\*") do (
     if exist "%%P\Web Data" (
         set /a profile_num+=1
@@ -45,8 +56,17 @@ for /d %%P in ("%CHROME_PATH%\*") do (
         )
         
         if defined export_profile (
+            set /a selected_count+=1
             set "PROFILE_NAME=%%~nxP"
-            set DESTINATION=%BASE_DESTINATION%_!PROFILE_NAME!.sql
+            
+            :: Sanitize profile name for filename (replace problematic characters)
+            set "SAFE_PROFILE_NAME=!PROFILE_NAME: =_!"
+            set "SAFE_PROFILE_NAME=!SAFE_PROFILE_NAME:(=_!"
+            set "SAFE_PROFILE_NAME=!SAFE_PROFILE_NAME:)=_!"
+            set "SAFE_PROFILE_NAME=!SAFE_PROFILE_NAME:[=_!"
+            set "SAFE_PROFILE_NAME=!SAFE_PROFILE_NAME:]=_!"
+            
+            set DESTINATION=%BASE_DESTINATION%_!SAFE_PROFILE_NAME!.sql
             set DESTINATION=!DESTINATION:\=/!
             
             echo Exporting Chrome keywords from !PROFILE_NAME! to !DESTINATION!...
@@ -78,6 +98,20 @@ for /d %%P in ("%CHROME_PATH%\*") do (
     )
 )
 
+:: Validate that at least one profile was processed
+if !selected_count! equ 0 (
+    echo.
+    echo Warning: No profiles were selected or found matching your selection.
+    if not "!selection!"=="all" (
+        echo Please ensure you entered valid profile numbers from 1 to !profile_count!.
+    )
+    echo.
+    pause
+    goto end
+)
+
 popd
-echo Export complete.
+echo.
+echo Export complete. Processed !selected_count! profile(s).
+:end
 pause
