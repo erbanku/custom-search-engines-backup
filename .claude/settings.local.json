@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /s /b \"E:\\Dev\\GitHub\\custom-search-engines-backup-v1\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
